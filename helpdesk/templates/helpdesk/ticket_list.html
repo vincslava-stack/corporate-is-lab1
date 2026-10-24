@@ -1,34 +1,87 @@
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <title>Заявки ИТ-отдела</title>
-</head>
-<body>
-    <h1>Заявки ИТ-отдела</h1>
-    <p>Всего заявок: {{ tickets|length }}</p>
+{% extends "helpdesk/base.html" %}
 
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>Тема</th>
-            <th>Кто обратился</th>
-            <th>Статус</th>
-            <th>Создана</th>
-        </tr>
+{% block title %}Список заявок{% endblock %}
 
-        {% for ticket in tickets %}
-        <tr>
-            <td>{{ ticket.title }}</td>
-            <td>{{ ticket.author }}</td>
-            <td>{{ ticket.get_status_display }}</td>
-            <td>{{ ticket.created_at|date:"d.m.Y H:i" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">Заявок пока нет</td>
-        </tr>
-        {% endfor %}
+{% block content %}
+<h1>Заявки ИТ-отдела</h1>
+
+<p>
+    <a class="button" href="{% url 'ticket_create' %}">
+        Создать заявку
+    </a>
+</p>
+
+<form method="get">
+    <p>
+        <label for="id_q">Поиск по заявкам:</label><br>
+        <input
+            type="text"
+            id="id_q"
+            name="q"
+            value="{{ query }}"
+            placeholder="Тема, автор или описание"
+        >
+    </p>
+
+    <p>
+        <label for="id_status">Фильтр по статусу:</label><br>
+        <select id="id_status" name="status">
+            <option value="">Все статусы</option>
+            <option value="new" {% if selected_status == "new" %}selected{% endif %}>
+                Новая
+            </option>
+            <option value="in_progress" {% if selected_status == "in_progress" %}selected{% endif %}>
+                В работе
+            </option>
+            <option value="done" {% if selected_status == "done" %}selected{% endif %}>
+                Выполнена
+            </option>
+        </select>
+    </p>
+
+    <button type="submit">Найти</button>
+    <a href="{% url 'ticket_list' %}">Сбросить фильтры</a>
+</form>
+
+<hr>
+
+{% if tickets %}
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Тема</th>
+                <th>Автор</th>
+                <th>Категория</th>
+                <th>Приоритет</th>
+                <th>Статус</th>
+                <th>Ответственный</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.pk }}</td>
+                    <td>
+                        <a href="{{ ticket.get_absolute_url }}">
+                            {{ ticket.title }}
+                        </a>
+                    </td>
+                    <td>{{ ticket.author }}</td>
+                    <td>{{ ticket.category|default:"Не указана" }}</td>
+                    <td>{{ ticket.get_priority_display }}</td>
+                    <td>{{ ticket.get_status_display }}</td>
+                    <td>{{ ticket.assignee|default:"Не назначен" }}</td>
+                    <td>{{ ticket.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</body>
-</html>
+{% else %}
+    <p>Заявки не найдены.</p>
+{% endif %}
+
+{% endblock %}

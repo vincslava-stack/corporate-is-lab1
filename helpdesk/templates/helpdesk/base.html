@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Учёт заявок ИТ-отдела{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background: #f5f6f8;
+            color: #222;
+        }
+        nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            padding: 16px;
+            background: #243447;
+            border-radius: 8px;
+        }
+        nav a, nav span {
+            color: white;
+            text-decoration: none;
+        }
+        main {
+            margin-top: 24px;
+            padding: 24px;
+            background: white;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #eef1f5;
+        }
+        input, select, textarea {
+            padding: 8px;
+            max-width: 100%;
+        }
+        button, .button {
+            display: inline-block;
+            padding: 9px 14px;
+            background: #1769aa;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .messages {
+            padding: 12px;
+            background: #eef7ee;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'ticket_list' %}">Заявки</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'ticket_create' %}">Создать заявку</a>
+            <span>{{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Выйти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Войти</a>
+        {% endif %}
+        <a href="/admin/">Администрирование</a>
+    </nav>
+
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

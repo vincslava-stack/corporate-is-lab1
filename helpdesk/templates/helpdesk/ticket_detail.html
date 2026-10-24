@@ -1,0 +1,61 @@
+
+{% extends "helpdesk/base.html" %}
+
+{% block title %}Заявка №{{ ticket.pk }}{% endblock %}
+
+{% block content %}
+    <p>
+        <a href="{% url 'ticket_list' %}">← К списку заявок</a>
+    </p>
+
+    <h1>Заявка №{{ ticket.pk }}: {{ ticket.title }}</h1>
+
+    <p><strong>Автор обращения:</strong> {{ ticket.author }}</p>
+    <p><strong>Описание:</strong> {{ ticket.description|default:"Не указано" }}</p>
+    <p><strong>Категория:</strong> {{ ticket.category|default:"Не указана" }}</p>
+    <p><strong>Приоритет:</strong> {{ ticket.get_priority_display }}</p>
+    <p><strong>Статус:</strong> {{ ticket.get_status_display }}</p>
+    <p><strong>Создал пользователь:</strong> {{ ticket.created_by|default:"Не указан" }}</p>
+    <p><strong>Ответственный:</strong> {{ ticket.assignee|default:"Не назначен" }}</p>
+    <p><strong>Создана:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+    <p><strong>Обновлена:</strong> {{ ticket.updated_at|date:"d.m.Y H:i" }}</p>
+
+    {% if can_edit_ticket %}
+        <hr>
+        <h2>Редактирование заявки</h2>
+
+        <p>
+            <a class="button" href="{% url 'ticket_update' ticket.pk %}">
+                Редактировать заявку
+            </a>
+        </p>
+    {% endif %}
+
+    {% if process_form %}
+        <hr>
+        <h2>Обработка заявки</h2>
+
+        <form method="post" action="{% url 'ticket_process' ticket.pk %}">
+            {% csrf_token %}
+
+            {% for field in process_form %}
+                <p>
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    <br>
+
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <br>
+                        <span style="color: #b00020;">{{ error }}</span>
+                    {% endfor %}
+                </p>
+            {% endfor %}
+
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    {% endif %}
+{% endblock %}
+

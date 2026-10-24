@@ -1,0 +1,45 @@
+
+{% extends "helpdesk/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <p>
+        <a href="{% url 'ticket_list' %}">← К списку заявок</a>
+    </p>
+
+    <h1>{{ title }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="messages">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <p>
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                <br>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <br>
+                    <span style="color: #b00020;">{{ error }}</span>
+                {% endfor %}
+            </p>
+        {% endfor %}
+
+        <button type="submit">Сохранить</button>
+        <a href="{% url 'ticket_list' %}">Отмена</a>
+    </form>
+{% endblock %}
