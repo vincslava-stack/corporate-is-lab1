@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Заявки ИТ-отдела</title>
+</head>
+<body>
+    <h1>Заявки ИТ-отдела</h1>
+    <p>Всего заявок: {{ tickets|length }}</p>
+
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>Тема</th>
+            <th>Кто обратился</th>
+            <th>Статус</th>
+            <th>Создана</th>
+        </tr>
+
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.title }}</td>
+            <td>{{ ticket.author }}</td>
+            <td>{{ ticket.get_status_display }}</td>
+            <td>{{ ticket.created_at|date:"d.m.Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Заявок пока нет</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
